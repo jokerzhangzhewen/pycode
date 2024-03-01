@@ -33,6 +33,7 @@ else:
 print(f'✅获取到{len(tokens)}个账号 默认并发数: {len(tokens)}')
 
 file_url = 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Code-KKK/pycode/main/compiled/'
+tools_dir = "tools"
 
 def check_environment(file_name):
     v, o, a = sys.version_info, platform.system(), platform.machine()
@@ -51,6 +52,12 @@ def check_environment(file_name):
             print(f"不符合运行要求: 当前处理器架构[{a}] 支持：x86_64 aarch64")
 
 def main_run(file_name, py_v, os_info, cpu_info):
+    if not os.path.exists(tools_dir):
+        os.makedirs(tools_dir)
+        print(f'本地不存在依赖文件，需要下载依赖文件')
+        file_url = "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Code-KKK/pycode/main/tools/encrypt_symmetric.py"
+        local_file_path = os.path.join(tools_dir, "encrypt_symmetric.py")
+        subprocess.run(["curl", "-o", local_file_path, file_url])
     if os.path.exists(file_name):
         file_name_ = os.path.splitext(file_name)[0]
         try:
