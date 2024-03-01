@@ -55,9 +55,9 @@ def main_run(file_name, py_v, os_info, cpu_info):
     if not os.path.exists(tools_dir):
         os.makedirs(tools_dir)
         print(f'本地不存在依赖文件，需要下载依赖文件')
-        file_url = "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Code-KKK/pycode/main/tools/encrypt_symmetric.py"
+        encryptfile_url = "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Code-KKK/pycode/main/tools/encrypt_symmetric.py"
         local_file_path = os.path.join(tools_dir, "encrypt_symmetric.py")
-        subprocess.run(["curl", "-o", local_file_path, file_url])
+        subprocess.run(["curl", "-o", local_file_path, encryptfile_url])
     if os.path.exists(file_name):
         file_name_ = os.path.splitext(file_name)[0]
         try:
