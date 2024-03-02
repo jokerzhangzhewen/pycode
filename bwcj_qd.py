@@ -39,34 +39,40 @@ file_url = 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Code-KK
 def check_environment(file_name):
     v, o, a = sys.version_info, platform.system(), platform.machine()
     print(f"Python版本: {v.major}.{v.minor}.{v.micro}, 操作系统类型: {o}, 处理器架构: {a}")
-    if (v.minor in [8,9,10,11]) and o.lower() in ['linux','windows'] and a.lower() in ['x86_64','amd64','aarch64']:
+    if (v.minor in [8,9,10,11]) and o.lower() in ['linux','windows'] and a.lower() in ['x86_64','amd64','aarch64','armv8l']:
         print("当前环境符合运行要求")
         if o.lower() == 'windows':
             file_name += '.pyd'
             main_run(file_name, v.minor, o.lower(), a.lower())
         if o.lower() == 'linux':
             file_name += '.so'
+            if  a.lower() == 'armv8l':
+                main_run(file_name, v.minor, o.lower(),'aarch64')
+                return
             main_run(file_name, v.minor, o.lower(), a.lower())
     else:
         if not (v.minor in [8,9,10,11]):
             print("不符合运行要求: Python版本不是 3.8 ~ 3.11")
         if not (o.lower() in ['linux','windows']):
             print(f"不符合运行要求: 操作系统类型[{o}] 支持：Linux或Window")
-        if not (a.lower() in ['x86_64','amd64','aarch64']):
-            print(f"不符合运行要求: 当前处理器架构[{a}] 支持：x86_64 amd64 aarch64")
+        if not (a.lower() in ['x86_64','amd64','aarch64','armv8l']):
+            print(f"不符合运行要求: 当前处理器架构[{a}] 支持：x86_64 amd64 aarch64/armv8l")
 
 def main_run(file_name, py_v, os_info, cpu_info):
-    if cpu_info == 'aarch64':
-        print('当前aarch64架构，如遇青龙容器运行报错，请先在青龙-依赖管理-Linux，添加gcc-aarch64-linux-gnu')
     if os.path.exists(file_name):
         file_name_ = os.path.splitext(file_name)[0]
-        Code_module = __import__(file_name_)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=int(bf)) as executor:
-            for num in range(len(tokens)):
-                runzh = num + 1
-                run = Code_module.bwcj(tokens[num],runzh)
-                executor.submit(run.main)
-                time.sleep(random.randint(2, 5))
+        try:
+            Code_module = __import__(file_name_)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=int(bf)) as executor:
+                for num in range(len(tokens)):
+                    runzh = num + 1
+                    run = Code_module.bwcj(tokens[num],runzh)
+                    executor.submit(run.main)
+                    time.sleep(random.randint(2, 5))
+        except Exception as e:
+            print(e) #打印运行报错信息
+            if 'ld-linux-aarch64.so' in e:
+                print('检测当前系统环境缺失ld-linux-aarch64.so.1请在库里lib目录下载修复ld-linux-aarch64.so.1.sh运行')
     else:
         print(f"不存在{file_name}功能模块,准备下载模块文件")
         download_file(file_name, py_v, os_info, cpu_info,file_url)

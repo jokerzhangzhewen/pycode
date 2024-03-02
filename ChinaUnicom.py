@@ -30,46 +30,52 @@ else:
     tokens = [token]
 
 
-print(f'✅获取到{len(tokens)}个账号 默认并发数: {len(tokens)}')
+print(f'✅获取到{len(tokens)}个账号')
 
 file_url = 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Code-KKK/pycode/main/compiled/'
 tools_dir = "tools"
+sys.path.append(tools_dir)
 
 def check_environment(file_name):
     v, o, a = sys.version_info, platform.system(), platform.machine()
     print(f"Python版本: {v.major}.{v.minor}.{v.micro}, 操作系统类型: {o}, 处理器架构: {a}")
-    if (v.minor in [8,9,10,11]) and o.lower() in ['linux'] and a.lower() in ['x86_64','aarch64']:
+    if (v.minor in [8,9,10,11]) and o.lower() in ['linux'] and a.lower() in ['x86_64','aarch64','armv8l']:
         print("当前环境符合运行要求")
         if o.lower() == 'linux':
             file_name += '.so'
+            if  a.lower() == 'armv8l':
+                main_run(file_name, v.minor, o.lower(),'aarch64')
+                return
             main_run(file_name, v.minor, o.lower(), a.lower())
     else:
         if not (v.minor in [8,9,10,11]):
             print("不符合运行要求: Python版本不是 3.8 ~ 3.11")
         if not (o.lower() in ['linux']):
             print(f"不符合运行要求: 操作系统类型[{o}] 支持：Linux")
-        if not (a.lower() in ['x86_64','aarch64']):
-            print(f"不符合运行要求: 当前处理器架构[{a}] 支持：x86_64 aarch64")
+        if not (a.lower() in ['x86_64','aarch64','armv8l']):
+            print(f"不符合运行要求: 当前处理器架构[{a}] 支持：x86_64 aarch64/armv8l")
 
 def main_run(file_name, py_v, os_info, cpu_info):
     if not os.path.exists(tools_dir):
         os.makedirs(tools_dir)
-        print(f'本地不存在依赖文件，需要下载依赖文件')
+    encrypt_symmetric_file = os.path.join(tools_dir, "encrypt_symmetric.py")
+    if not os.path.exists(encrypt_symmetric_file):
+        print(f'本地不存在依赖文件，即将下载依赖文件')
         encryptfile_url = "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Code-KKK/pycode/main/tools/encrypt_symmetric.py"
-        local_file_path = os.path.join(tools_dir, "encrypt_symmetric.py")
-        subprocess.run(["curl", "-o", local_file_path, encryptfile_url])
+        subprocess.run(["curl", "-o", encrypt_symmetric_file, encryptfile_url])
     if os.path.exists(file_name):
         file_name_ = os.path.splitext(file_name)[0]
         try:
             Code_module = __import__(file_name_)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=int(len(tokens))) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
                 for num in range(len(tokens)):
                     run = Code_module.China_Unicom(tokens[num])
                     executor.submit(run.main)
                     time.sleep(random.randint(2, 3))
         except Exception as e:
-            print(e)
-            print('aarch64架构如遇青龙容器运行报错，请在库里lib目录下载修复ld-linux-aarch64.so.1.sh运行')
+            print(e) #打印运行报错信息
+            if 'ld-linux-aarch64.so' in e:
+                print('检测当前系统环境缺失ld-linux-aarch64.so.1请在库里lib目录下载修复ld-linux-aarch64.so.1.sh运行')
     else:
         print(f"不存在{file_name}功能模块,准备下载模块文件")
         download_file(file_name, py_v, os_info, cpu_info,file_url)
