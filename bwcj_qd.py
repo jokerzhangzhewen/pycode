@@ -4,7 +4,12 @@ new Env('霸王茶姬签到');
 环境变量: 名称：bwcjCookie
 捉包小程序 webapi.qmai.cn 域名请求头里面的 Qm-User-Token 值
 
-多账号新建变量或者用 & 分开
+多账号新建变量或者用 & 分开 
+2024.3.18 修复无法签到问题，新增抽奖次数参数
+在需要执行积分抽奖的token后面加上#抽奖数(每日上限最大5)，每次需要5积分
+
+如：al3U******#5&Qm-User-Token值#3&Qm-User-Token值
+
 并发变量: bwcj_BF  默认不设置为1
 """
 import random
