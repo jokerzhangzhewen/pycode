@@ -6,8 +6,8 @@
         "scriptMsg": ""
     },
     "unicom": {
-        "status": 1,
-        "updateMsg": "2024.05.27 提示：本脚本停止维护。下一期6月的阅光宝盒不再更新。",
+        "status": 0,
+        "updateMsg": "2024.05.27 提示：本脚本停止维护。",
         "version": 1.03,
         "scriptMsg": ""
     },
