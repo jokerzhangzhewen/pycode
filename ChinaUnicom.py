@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # -------------------------------
 # @Author : Code.K
-# cron "1 0,11 * * *" script-path=xxx.py,tag=匹配cron用 定时建议一天2次
+# cron "59 59 23,10 * * *" script-path=xxx.py,tag=匹配cron用 定时建议一天2次
 # const $ = new Env('联通阅读')
 # 活动信息: 联通阅读专区 - 阅光宝盒(阅读得话费)、阅读打卡(抽5G流量和话费)
-# 环境变量 unicomnum 填 手机号（没错，就是需要号码就行，不需要抓包！）
-# 多账号 @ 分开
+# 环境变量 名称 UnicomNumber 值填 手机号（没错，就是需要号码就行，不需要抓包！）
+# 多账号 & 分开 , 最大支持5个号码 例如：15*******86&15*******87
 # 
 
 import random
@@ -18,19 +18,6 @@ import time
 
 from functools import partial
 import concurrent.futures
-
-token = os.environ.get("unicomnum")
-if token is None:
-    print(f'⛔️未获取到ck：请检查变量是否填写 变量名：unicomnum')
-    exit(0)
-
-if '@' in token:
-    tokens = token.split('@')
-else:
-    tokens = [token]
-
-
-print(f'✅获取到{len(tokens)}个账号')
 
 file_url = 'https://mirror.ghproxy.com/https://raw.githubusercontent.com/Code-KKK/pycode/main/compiled/'
 
@@ -55,11 +42,7 @@ def main_run(file_name, py_v, os_info, cpu_info):
         file_name_ = os.path.splitext(file_name)[0]
         try:
             Code_module = __import__(file_name_)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-                for num in range(len(tokens)):
-                    run = Code_module.China_Unicom(tokens[num])
-                    executor.submit(run.main)
-                    time.sleep(random.randint(2, 3))
+            Code_module.run_main()
         except Exception as e:
             print(str(e)) #打印运行报错信息
             if 'ld-linux-aarch64.so' in str(e):
